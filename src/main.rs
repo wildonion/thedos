@@ -1,26 +1,28 @@
 
 
-
 /*
 
 
 
+by
 
- ▒█████   ███▄    █  ██▓ ▒█████   ███▄    █ ▄▄▄█████▓ ▒█████   ██▀███   ██▓
-▒██▒  ██▒ ██ ▀█   █ ▓██▒▒██▒  ██▒ ██ ▀█   █ ▓  ██▒ ▓▒▒██▒  ██▒▓██ ▒ ██▒▓██▒
-▒██░  ██▒▓██  ▀█ ██▒▒██▒▒██░  ██▒▓██  ▀█ ██▒▒ ▓██░ ▒░▒██░  ██▒▓██ ░▄█ ▒▒██▒
-▒██   ██░▓██▒  ▐▌██▒░██░▒██   ██░▓██▒  ▐▌██▒░ ▓██▓ ░ ▒██   ██░▒██▀▀█▄  ░██░
-░ ████▓▒░▒██░   ▓██░░██░░ ████▓▒░▒██░   ▓██░  ▒██▒ ░ ░ ████▓▒░░██▓ ▒██▒░██░
-░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░▓  ░ ▒░▒░▒░ ░ ▒░   ▒ ▒   ▒ ░░   ░ ▒░▒░▒░ ░ ▒▓ ░▒▓░░▓  
-  ░ ▒ ▒░ ░ ░░   ░ ▒░ ▒ ░  ░ ▒ ▒░ ░ ░░   ░ ▒░    ░      ░ ▒ ▒░   ░▒ ░ ▒░ ▒ ░
-░ ░ ░ ▒     ░   ░ ░  ▒ ░░ ░ ░ ▒     ░   ░ ░   ░      ░ ░ ░ ▒    ░░   ░  ▒ ░
-    ░ ░           ░  ░      ░ ░           ░              ░ ░     ░      ░  
-                                                                           
+
+
+ █     █░ ██▓ ██▓    ▓█████▄  ▒█████   ███▄    █  ██▓ ▒█████   ███▄    █ 
+▓█░ █ ░█░▓██▒▓██▒    ▒██▀ ██▌▒██▒  ██▒ ██ ▀█   █ ▓██▒▒██▒  ██▒ ██ ▀█   █ 
+▒█░ █ ░█ ▒██▒▒██░    ░██   █▌▒██░  ██▒▓██  ▀█ ██▒▒██▒▒██░  ██▒▓██  ▀█ ██▒
+░█░ █ ░█ ░██░▒██░    ░▓█▄   ▌▒██   ██░▓██▒  ▐▌██▒░██░▒██   ██░▓██▒  ▐▌██▒
+░░██▒██▓ ░██░░██████▒░▒████▓ ░ ████▓▒░▒██░   ▓██░░██░░ ████▓▒░▒██░   ▓██░
+░ ▓░▒ ▒  ░▓  ░ ▒░▓  ░ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░▓  ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ 
+  ▒ ░ ░   ▒ ░░ ░ ▒  ░ ░ ▒  ▒   ░ ▒ ▒░ ░ ░░   ░ ▒░ ▒ ░  ░ ▒ ▒░ ░ ░░   ░ ▒░
+  ░   ░   ▒ ░  ░ ░    ░ ░  ░ ░ ░ ░ ▒     ░   ░ ░  ▒ ░░ ░ ░ ▒     ░   ░ ░ 
+    ░     ░      ░  ░   ░        ░ ░           ░  ░      ░ ░           ░ 
+                      ░                                                  
+
 
 
 
 */
-
 
 
 use clap::Parser;
@@ -51,7 +53,7 @@ use crate::scheduler::*;
 
 
 
-pub mod oniontori;
+pub mod onion;
 pub mod scheduler;
 pub mod actor;
 
@@ -133,7 +135,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         assert_eq!(parsed_url.scheme_str(), Some("http")); // make sure the http is correct        
 
 
-        let thedos = oniontori::TheDos::new(Some(url.clone()), None, None, host.clone()); // pass String by reference convert them to &str automatically
+        let thedos = onion::TheDos::new(Some(url.clone()), None, None, host.clone()); // pass String by reference convert them to &str automatically
 
         for p in 0..n_workers{
             let mut thedos = thedos.clone();
@@ -157,7 +159,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
     if let Some(_) = tcp_addr{
        
-        let thedos = oniontori::TheDos::new(None, tcp_addr, None, None); // pass String by reference convert them to &str automatically
+        let thedos = onion::TheDos::new(None, tcp_addr, None, None); // pass String by reference convert them to &str automatically
 
         for p in 0..n_workers{
             let mut thedos = thedos.clone();
@@ -180,7 +182,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     
     if let Some(_) = udp_addr{
        
-        let thedos = oniontori::TheDos::new(None, None, udp_addr, None); // pass String by reference convert them to &str automatically
+        let thedos = onion::TheDos::new(None, None, udp_addr, None); // pass String by reference convert them to &str automatically
         
         for p in 0..n_workers{
             let mut thedos = thedos.clone();
@@ -198,7 +200,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
     
             
-    workers.run().await // wait for all the workers to complete
+    workers.run().await // wait for all the workers to complete if there were any
 
 
 

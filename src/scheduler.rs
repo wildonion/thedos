@@ -12,7 +12,7 @@ use crate::*; // loading all defined crates, structs and functions from the root
 
 
 // async worker pool scheduler using tokio based on mpsc jobq channel
-
+// mpsc means multiple threads can read the data or multiple sender can be cloned but only one thread or receiver can mutate the data
 
 
 
