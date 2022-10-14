@@ -1,7 +1,7 @@
 
 
 <p align="center">
-    <img src="https://github.com/wildonion/thedos/blob/master/logo.png"
+    <img src="https://github.com/wildonion/thedos/blob/master/punch.png"
 </p>
 
 
@@ -11,26 +11,20 @@ Asynchronous & Multithreaded Based Tools to Attack Network
 
 > Run it over TOR
 
-# Usage
+## Usage
 
 * run the attack using 4096 workers
 
-```cargo run http://target.com 4096```
+```cargo run -- --help```
 
-### DDOS Support Protocols
+* start http attack with 4096 workers
+
+```cargo run -- --http-addr http://example.app --workers 4096```
+
+## DDOS Support Protocols
 
 - TCP
 
 - UDP
 
 - HTTP
-
-### TODO
-
-- add macros
-
-- add traits
-
-- add jobq channel to the async scheduler
-
-- fix monitoring attack bug

