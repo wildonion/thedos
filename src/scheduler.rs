@@ -98,7 +98,7 @@ impl Worker{
 
 
 
-// async worker pool scheduler using tokio
+// async worker pool scheduler using tokio based on mpsc jobq channel
 
 
 
@@ -112,7 +112,7 @@ pub struct Workers<E>{
 
 impl<E: Send + 'static> Workers<E>{ // E can be shared between threads
 
-    pub fn new() -> Self{
+    pub fn new(size: usize) -> Self{
         let (sender, receiver) = mpsc::unbounded_channel(); // async mpsc channel with no byte limitation 
         Workers{
             count: 0,

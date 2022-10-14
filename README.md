@@ -1,5 +1,8 @@
 
 
+<p align="center">
+    <img src="https://github.com/wildonion/thedos/blob/master/logo.png"
+</p>
 
 
 ## TheDos
@@ -10,7 +13,7 @@ Asynchronous & Multithreaded Based Tools to Attack Network
 
 # Usage
 
-* run the attack on 4096 packets
+* run the attack using 4096 workers
 
 ```cargo run http://target.com 4096```
 
@@ -27,8 +30,6 @@ Asynchronous & Multithreaded Based Tools to Attack Network
 - add macros
 
 - add traits
-
-- add clap for tcp and udp
 
 - add jobq channel to the async scheduler
 

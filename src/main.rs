@@ -65,7 +65,7 @@ struct Arguments{
     pub url: String,
     pub tcp_addr: String,
     pub udp_addr: String,
-    pub proc: u128,
+    pub workers: u128,
 }
 
 
@@ -77,7 +77,7 @@ struct Arguments{
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>{
 
 
-    let mut workers = Workers::new();
+    let mut workers = Workers::new(10);
     let stdout = ConsoleAppender::builder().build();
     let config = Config::builder()
                                     .appender(Appender::builder().build("stdout", Box::new(stdout)))
