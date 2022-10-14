@@ -9,6 +9,8 @@
 
 Attack networks asynchronously by getting help of workers! 
 
+> Nginx Log
+
 <p align="center">
     <img src="https://github.com/wildonion/thedos/blob/master/log_nginx.png"
 </p>
