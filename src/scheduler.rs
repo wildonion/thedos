@@ -57,7 +57,7 @@ impl<E: Send + 'static> Workers<E>{ // E can be shared between threads
         std::mem::drop(self.sender); // make sure that the sender is dead since we want to receive all the messages and avoid deadlocks and race condition
         let mut index = 0;
 
-        loop{
+        loop{ // we can use while let Some() syntax
             match self.receiver.recv().await{
                 Some(Ok(())) => {
                     assert!(index < self.count);
