@@ -113,7 +113,7 @@ impl TheDos{
 
     pub async fn httpcall(&mut self){ // url is &str thus we don't need to clone it since its sized
         
-        let param_joiner = if self.url.as_ref().unwrap().as_str().matches("&").count() > 0{ // can't move self.url since it's behind a mutable reference thus we have to borrow it using as_ref() method
+        let param_joiner = if self.url.as_ref().unwrap().as_str().matches("&").count() > 0{ // can't move self.url since it's behind a mutable reference thus we have to either borrow it using as_ref() method or clone it
             "&"
         } else{
             "?"
