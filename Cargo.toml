@@ -23,6 +23,7 @@ chrono = { version = "0.4", features = ["serde"] }
 log4rs = "1.1.1"
 clap = { version = "4", features = ["derive"] }
 tokio-cron-scheduler = "0.8.1"
+async-trait = "0.1.57"
 
 
 
@@ -33,6 +34,7 @@ tokio-cron-scheduler = "0.8.1"
 # we need lib.rs and crate type of cdylib for none binary like .wasm, .so, .dylib and .dll files
 crate-type = ["cdylib", "rlib"]
 path = "src/lib.rs"
+name = "utils"
 
 
 
@@ -40,4 +42,4 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "thedos"
-path = "src/cry.rs"
+path = "src/onion.rs"
