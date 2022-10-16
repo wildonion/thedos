@@ -22,9 +22,22 @@ serde = {version = "1", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 log4rs = "1.1.1"
 clap = { version = "4", features = ["derive"] }
+tokio-cron-scheduler = "0.8.1"
+
+
+
+
+
+[lib]
+# libraries don't have entry points, you can't run them,they're used for functionality sharing like binding a .wasm into js codes
+# we need lib.rs and crate type of cdylib for none binary like .wasm, .so, .dylib and .dll files
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+
 
 
 
 [[bin]]
 name = "thedos"
-path = "src/main.rs"
+path = "src/cry.rs"

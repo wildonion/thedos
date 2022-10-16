@@ -5,7 +5,7 @@
 </p>
 
 
-## ☠ TheDos
+## ☠ TheDoS (The Developer of Sin)
 
 Attack networks asynchronously by getting help of workers! 
 
