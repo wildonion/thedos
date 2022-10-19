@@ -78,6 +78,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
 
 
+    // todo
+    // connect to different vpn every 30 seconds to avoid hit by blocking
+
+
+    (
+        || async move{
+            34
+        }
+    )().await;
+
+
     
     // cli args parsing 
     
@@ -86,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut n_workers = arg.workers.unwrap_or(4096);
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
-    let mut actor = Actor::new(n_workers as usize);
+    let mut actor = Actor::new();
     
     
 

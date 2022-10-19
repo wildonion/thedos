@@ -47,11 +47,6 @@ pub mod _async{
     use crate::*;
     
     
-    
-    
-    
-    // todo ➔ actors proc macros and traits inside the lib.rs
-    // ...
 
 
 
@@ -64,7 +59,7 @@ pub mod _async{
 
     impl<E: Send + 'static> Actor<E>{ // E can be shared between threads
 
-        pub fn new(size: usize) -> Self{
+        pub fn new() -> Self{
             let (sender, receiver) = mpsc::unbounded_channel(); // async mpsc jobq channel channel with no byte limitation to avoid deadlocks and race conditions
             Actor{
                 count: 0,

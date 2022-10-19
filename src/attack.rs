@@ -185,12 +185,16 @@ impl TheDos{
         let mut res = self.send_get().await;
 
         while let Err(e) = res{
+            
             eprintln!("can't send to {} at {} due to {}", self.url.as_ref().unwrap(), chrono::Local::now(), e);
             println!("retring send get at {}", chrono::Local::now());
             res = self.send_get().await; // send the get untill all workers get finished
+            
             if self.retries >= self.n_workers{
+                println!("reached the maximum workers at {}", chrono::Local::now());
                 process::exit(1); // reached the maximum workers
             }
+
         } 
         
     
@@ -238,7 +242,9 @@ impl TheDos{
     
     pub async fn udpcall(&mut self){
         
-        todo!();
+        loop{
+            // flooding udp attack 
+        }
 
     }
 
