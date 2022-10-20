@@ -19,32 +19,30 @@
     • References must always be valid.
 
 
+
+    ➔ actors uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
+    ➔ messages must be Send Sync static and Arc<Mutex<Message>> to share between actor threads
+    ➔ mpsc means multiple threads can read the data which i Send + Sync + 'static or multiple sender can be cloned but only one thread or receiver can mutate the data
+
+
 */
 
 
-// https://blog.softwaremill.com/multithreading-in-rust-with-mpsc-multi-producer-single-consumer-channels-db0fc91ae3fa
-// https://ryhl.io/blog/actors-with-tokio/
-// https://ryhl.io/blog/async-what-is-blocking/
 
 
 
 
-
-
-// actors uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
-// messages must be Send Sync static and Arc<Mutex<Message>> to share between actor threads
-// mpsc means multiple threads can read the data which i Send + Sync + 'static or multiple sender can be cloned but only one thread or receiver can mutate the data
 
 
 
 
 pub mod _async{
 
+
     // async worker pool scheduler using tokio based on mpsc jobq channel
 
-    
-    
     use crate::*;
+    
     
     
 
@@ -140,9 +138,14 @@ pub mod _async{
 pub mod sync{
 
 
+    // a sync task scheduler (worker pool) with mpsc as the jobq channel protocol
+
+
     use crate::*;
     
-    // a sync task scheduler (worker pool) with mpsc as the jobq channel protocol
+
+
+
 
     type Job = Box<dyn FnOnce() + Send + 'static>; //-- a job is of type closure which must be Send and static across all threads inside a Box on the heap
 

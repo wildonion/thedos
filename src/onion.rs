@@ -35,7 +35,7 @@ use hyper::{Client, Uri, Body, Request, client::HttpConnector, Response};
 use rand::Rng;
 use borsh::{BorshDeserialize, BorshSerialize};
 use log::{info, error, LevelFilter};
-use tokio::net::{TcpListener, TcpStream}; //-- async tcp listener and stream
+use tokio::net::{TcpListener, TcpStream, UdpSocket}; //-- async tcp listener and stream
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::mpsc;
 use uuid::Uuid;
@@ -78,15 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
 
 
-    // todo
-    // connect to different vpn every 30 seconds to avoid hit by blocking
 
-
-    (
-        || async move{
-            34
-        }
-    )().await;
 
 
     
@@ -111,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     if let Some(mut url) = url{
 
         let re = Regex::new(r#"\\"(https?\\"://)?([^/]*)/?.*"#).unwrap(); // https://stackoverflow.com/a/54061205
-        let url_with_slash = &format!("{}/", url.clone()); // making a longer lifetime of the url which is outside of the following if 
+        let url_with_slash = &format!("{}/", url.clone()); // making a longer lifetime of the url since is outside of the following if 
         if !url.ends_with("/"){
             // url = &format!("{}/", url.clone()); // when we initialize a new url with format! it's valid as long as we're inside the if and once we get outta of this scope url will no longer be valid
             url = url_with_slash.to_string();
