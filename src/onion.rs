@@ -72,7 +72,7 @@ struct Arguments{
 
 
 
-#[tokio::main(flavor="multi_thread", worker_threads=10)] //// use the tokio multi threaded runtime by spawning 10 threads
+#[tokio::main(flavor="multi_thread", worker_threads=10)] //// use the tokio multi threaded runtime by spawning 10 threads in overall
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>{ // implementing the Error trait for any type that might cause to an error at runtime; traits doesn't have any fixed size at compile time thus we must put them inside a Box and since we're implementing it for also an unknown size type we must put a dyn keyword behind it
 
 
@@ -90,6 +90,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
     let mut actor = Actor::new();
+    let pool = ThreadPool::new(n_workers);
     
     
 
@@ -121,6 +122,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         let thedos = attack::TheDos::new(Some(url.clone()), None, None, host.clone(), n_workers); // pass String by reference convert them to &str automatically
 
         for p in 0..n_workers{
+
+            // ---------------
+            // sync threadpool
+            // ---------------
+            // pool.execute(move ||{
+            //     block_on(thedos.httpcall());
+            // });
+
             println!("➔ worker {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
             actor.spawn(async move{

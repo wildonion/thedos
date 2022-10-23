@@ -6,6 +6,9 @@
 /*
 
 
+➔ actors uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
+➔ messages must be Send Sync static and Arc<Mutex<Message>> to share between actor threads
+➔ mpsc means multiple threads can read the data which i Send + Sync + 'static or multiple sender can be cloned but only one thread or receiver can mutate the data
 ➔ The three causes of data races
     • Two or more pointers access the same data at the same time.
     • At least one of the pointers is being used to write to the data.
@@ -19,14 +22,7 @@
     • References must always be valid.
 
 
-
-    ➔ actors uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
-    ➔ messages must be Send Sync static and Arc<Mutex<Message>> to share between actor threads
-    ➔ mpsc means multiple threads can read the data which i Send + Sync + 'static or multiple sender can be cloned but only one thread or receiver can mutate the data
-
-
 */
-
 
 
 
@@ -44,6 +40,11 @@ pub mod _async{
     use crate::*;
     
     
+
+
+    // https://blog.softwaremill.com/multithreading-in-rust-with-mpsc-multi-producer-single-consumer-channels-db0fc91ae3fa
+    // https://ryhl.io/blog/actors-with-tokio/
+    // https://ryhl.io/blog/async-what-is-blocking/
     
 
 
@@ -58,26 +59,26 @@ pub mod _async{
     impl<E: Send + 'static> Actor<E>{ // E can be shared between threads
 
         pub fn new() -> Self{
-            let (sender, receiver) = mpsc::unbounded_channel(); // async mpsc jobq channel channel with no byte limitation to avoid deadlocks and race conditions
+            let (sender, 
+                receiver) = mpsc::unbounded_channel(); // async mpsc jobq channel channel with no byte limitation to avoid deadlocks and race conditions
             Actor{
-                count: 0,
+                count: 0, // will be equaled to the number of workers by solving all the jobs which are comming to the downside of the mpsc jobq channel
                 sender,
                 receiver
             }
         }
         
 
-        pub fn schedule(){
+        pub fn schedule<T>(){
 
-            // schedule attack every 40 seconds after any error
+            todo!() // ➔ schedule attack every 40 seconds after any error
 
         }
 
 
         pub fn broadcast(){
             
-            // todo - use tokio::sync::broadcast
-            todo!()
+            todo!() // ➔ use tokio::sync::broadcast
         
         }
 
@@ -85,7 +86,7 @@ pub mod _async{
         pub fn spawn<T>(&mut self, task: T)
             where 
                 T: Future<Output=Result<(), E>> + Send + 'static, // T can be shared between threads
-                T::Output: Is<Type = Result<(), E>>, // T is a future and now we can access the Output type to make sure that is of type Result<(), E>
+                T::Output: Is<Type = Result<(), E>>, // T is a future and now we can access the Output type to make sure that is of type Result<(), E> - T::Output is the GAT of the Future trait
                 {
                     let sender = self.sender.clone();
                     tokio::spawn(async move{ // spawn the task inside tokio green threads

