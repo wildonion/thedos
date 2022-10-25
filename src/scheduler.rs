@@ -5,8 +5,8 @@
 
 /*
 
-
-➔ actors uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
+➔ sending data between threads must be done by using jobq channels
+➔ actors are workers which uses jobq channels to send message events asyncly between other actors and the system to execute them inside their free thread from the thread pool
 ➔ messages must be Send Sync static and Arc<Mutex<Message>> to share between actor threads
 ➔ mpsc means multiple threads can read the data which i Send + Sync + 'static or multiple sender can be cloned but only one thread or receiver can mutate the data
 ➔ The three causes of data races
@@ -35,16 +35,13 @@
 pub mod _async{
 
 
-    // async worker pool scheduler using tokio based on mpsc jobq channel
+    // async worker pool scheduler using tokio based on mpsc jobq channel protocol
+    // this scheduler is used for asynchronous IO by not blocking the thread using tokio
+
 
     use crate::*;
     
-    
 
-
-    // https://blog.softwaremill.com/multithreading-in-rust-with-mpsc-multi-producer-single-consumer-channels-db0fc91ae3fa
-    // https://ryhl.io/blog/actors-with-tokio/
-    // https://ryhl.io/blog/async-what-is-blocking/
     
 
 
@@ -140,6 +137,7 @@ pub mod sync{
 
 
     // a sync task scheduler (worker pool) with mpsc as the jobq channel protocol
+    // this scheduler is used for synchronous IO by blocking the thread using rust native std thread - alternative to this is rayon
 
 
     use crate::*;
@@ -167,7 +165,7 @@ pub mod sync{
 
     impl ThreadPool{
         
-        pub fn new(size: usize) -> ThreadPool {
+        pub fn spawn(size: usize) -> ThreadPool {
             assert!(size > 0);
             let (sender, receiver) = std_mpsc::channel();
             let receiver = Arc::new(Mutex::new(receiver)); //-- reading and writing from an IO must be mutable thus the receiver must be inside a Mutex cause data inside Arc can't be borrows as mutable since the receiver read operation is a mutable process

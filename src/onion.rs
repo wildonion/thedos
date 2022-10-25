@@ -25,13 +25,14 @@
 
 
 use clap::Parser;
+use futures::executor::block_on;
 use regex::Regex;
 use is_type::Is;
 use std::future::Future;
 use std::thread;
 use std::sync::{Arc, Mutex, mpsc as std_mpsc};
 use std::process;
-use hyper::{Client, Uri, Body, Request, client::HttpConnector, Response};
+use hyper::{Client, Uri, Body, Request, Response};
 use rand::Rng;
 use borsh::{BorshDeserialize, BorshSerialize};
 use log::{info, error, LevelFilter};
@@ -90,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
     let mut actor = Actor::new();
-    let pool = ThreadPool::new(n_workers);
+    let pool = ThreadPool::spawn(n_workers);
     
     
 
@@ -123,19 +124,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
         for p in 0..n_workers{
 
+            println!("➔ worker {} finished at {}", p, chrono::Local::now());
+            let mut thedos = thedos.clone();
+            
             // ---------------
             // sync threadpool
             // ---------------
             // pool.execute(move ||{
             //     block_on(thedos.httpcall());
             // });
-
-            println!("➔ worker {} finished at {}", p, chrono::Local::now());
-            let mut thedos = thedos.clone();
+            // 
+            // rayon::spawn(move ||{
+            //     block_on(thedos.httpcall()); 
+            // });
+            // 
+            //
+            // ----------------------
+            // async threadpool actor
+            // ----------------------
             actor.spawn(async move{
                 thedos.httpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
+        
         }
     
     }

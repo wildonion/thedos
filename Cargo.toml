@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
+rayon = "1"
 rand = "0.8"
 uuid = { version = "1", features = ["serde", "v4"] }
 borsh = "0.9.3"
