@@ -40,7 +40,7 @@ use tokio::net::{TcpListener, TcpStream, UdpSocket}; //-- async tcp listener and
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::mpsc;
 use uuid::Uuid;
-use crate::scheduler::{sync::ThreadPool, _async::Actor};
+use crate::scheduler::{sync::ThreadPool as NativeSyncWorker, sync::Pool as RayonSyncWorker, _async::Worker as AsyncWorker};
 use utils;
 
 
@@ -90,8 +90,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut n_workers = arg.workers.unwrap_or(4096);
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
-    let mut actor = Actor::new();
-    let pool = ThreadPool::spawn(n_workers);
+    let mut async_worker = AsyncWorker::new();
+    let native_sync_worker = NativeSyncWorker::spawn(n_workers);
+    let rayon_sync_worker = RayonSyncWorker::new();
     
     
 
@@ -126,23 +127,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
             println!("➔ worker {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
+        
             
-            // ---------------
-            // sync threadpool
-            // ---------------
-            // pool.execute(move ||{
+            // ----------------
+            // sync threadpools
+            // ----------------
+            // native_sync_worker.execute(move ||{
             //     block_on(thedos.httpcall());
             // });
-            // 
-            // rayon::spawn(move ||{
+            //
+            // There is no guaranteed order of execution for spawns, 
+            // given that other threads may steal tasks at any time. 
+            // However, they are generally prioritized in a LIFO order 
+            // on the thread from which they were spawned. Other threads 
+            // always steal from the other end of the deque, like FIFO order. 
+            // The idea is that "recent" tasks are most likely to be fresh 
+            // in the local CPU's cache, while other threads can steal older "stale" tasks.
+            // rayon_sync_worker.spawn(move ||{
             //     block_on(thedos.httpcall()); 
             // });
             // 
             //
             // ----------------------
-            // async threadpool actor
+            // async threadpool worker
             // ----------------------
-            actor.spawn(async move{
+            async_worker.spawn(async move{
                 thedos.httpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
@@ -168,7 +177,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         for p in 0..n_workers{
             println!("➔ worker {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
-            actor.spawn(async move{
+            async_worker.spawn(async move{
                 thedos.tcpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
@@ -192,7 +201,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         for p in 0..n_workers{
             println!("➔ worker {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
-            actor.spawn(async move{
+            async_worker.spawn(async move{
                 thedos.udpcall().await;
                 Ok(())
             }) // if Ok(()) and worker spawn() method went wrong error would be Box<dyn std::err::Error + Send + Sync 'static>
@@ -208,7 +217,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     println!("ctrl-c received");
 
             
-    actor.execute().await // wait for all the workers of this actor to complete if there were any
+    async_worker.execute().await // wait for all the workers of this worker to complete if there were any
 
 
 
