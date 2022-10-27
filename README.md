@@ -37,6 +37,6 @@ OR
 
 ## 🏗️ WIP
 
-* udp attack
+* proxy list
 
-* dns attack
+* `spread`, `install` and `persistence` methods
