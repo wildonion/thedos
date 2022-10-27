@@ -134,7 +134,11 @@ pub mod _async{
 
 pub mod sync{
 
-
+    // spawning native threads are too slow since thread handling in rust is depends on user base context switching 
+    // means based on the load of IO in the app rust can solve the data load inside another cpu core.
+    //   
+    // https://www.reddit.com/r/rust/comments/az9ogy/help_am_i_doing_something_wrong_or_do_threads/
+    // https://www.reddit.com/r/rust/comments/cz4bt8/is_there_a_simple_way_to_create_lightweight/
     // a sync task scheduler (worker pool) with mpsc as the jobq channel protocol
     // this scheduler is used for synchronous IO by blocking the thread using rust native std thread - alternative to this is rayon
 
