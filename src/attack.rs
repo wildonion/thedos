@@ -160,9 +160,9 @@ impl TheDos{
     
     pub fn headers_referers(&self) -> Vec<&str>{ // it's ok to return Vec<&str> since we're using the lifetime of the self
         let mut headers_referers = Vec::<&str>::new();
-        headers_referers.push("http://snappfood.ir/");
-        headers_referers.push("http://digikala.com/");
-        headers_referers.push("http://arvancloud.com/");
+        headers_referers.push("http://example.come/"); /////////// TODO - change this
+        headers_referers.push("http://example.com/"); /////////// TODO - change this
+        headers_referers.push("http://example.com/"); /////////// TODO - change this
         headers_referers.push(self.host.as_ref().unwrap().as_str());
 
         headers_referers
