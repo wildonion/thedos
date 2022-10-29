@@ -5,6 +5,10 @@
 </p>
 
 
+## 🚨 Disclaimer
+
+I AM **NOT** RESPONSIBLE FOR WHAT YOU WANT TO DO WITH THIS TOOL, THIS IS FOR EDUCATIONAL PURPOSES.
+
 ## ☠ TheDoS (The Developer of Sin)
 
 Attack networks asynchronously by getting help of workers! 
