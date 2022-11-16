@@ -65,7 +65,7 @@ struct Arguments{
     #[clap(long)]
     pub udp_addr: Option<String>, // it can be empty on cli
     #[clap(long)]
-    pub workers: Option<usize>,
+    pub jobs: Option<usize>,
 }
 
 
@@ -87,11 +87,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     
     let arg = Arguments::parse();
     let mut url = arg.http_addr;
-    let mut n_workers = arg.workers.unwrap_or(4096);
+    let mut n_jobs = arg.jobs.unwrap_or(4096);
     let mut tcp_addr = arg.tcp_addr;
     let mut udp_addr = arg.udp_addr;
     let mut async_worker = AsyncWorker::new();
-    let native_sync_worker = NativeSyncWorker::spawn(n_workers);
+    let native_sync_worker = NativeSyncWorker::spawn(n_jobs);
     let rayon_sync_worker = RayonSyncWorker::new();
     
     
@@ -121,11 +121,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
         assert_eq!(parsed_url.scheme_str(), Some("http")); // make sure the http is correct        
 
 
-        let thedos = attack::TheDos::new(Some(url.clone()), None, None, host.clone(), n_workers); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(Some(url.clone()), None, None, host.clone(), n_jobs); // pass String by reference convert them to &str automatically
 
-        for p in 0..n_workers{
+        for p in 0..n_jobs{
 
-            println!("➔ worker {} finished at {}", p, chrono::Local::now());
+            println!("➔ job {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
         
             
@@ -172,10 +172,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
     if let Some(_) = tcp_addr{
        
-        let thedos = attack::TheDos::new(None, tcp_addr, None, None, n_workers); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(None, tcp_addr, None, None, n_jobs); // pass String by reference convert them to &str automatically
 
-        for p in 0..n_workers{
-            println!("➔ worker {} finished at {}", p, chrono::Local::now());
+        for p in 0..n_jobs{
+            println!("➔ job {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
             async_worker.spawn(async move{
                 thedos.tcpcall().await;
@@ -196,10 +196,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     
     if let Some(_) = udp_addr{
        
-        let thedos = attack::TheDos::new(None, None, udp_addr, None, n_workers); // pass String by reference convert them to &str automatically
+        let thedos = attack::TheDos::new(None, None, udp_addr, None, n_jobs); // pass String by reference convert them to &str automatically
         
-        for p in 0..n_workers{
-            println!("➔ worker {} finished at {}", p, chrono::Local::now());
+        for p in 0..n_jobs{
+            println!("➔ job {} finished at {}", p, chrono::Local::now());
             let mut thedos = thedos.clone();
             async_worker.spawn(async move{
                 thedos.udpcall().await;

